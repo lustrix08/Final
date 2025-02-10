@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Surprise</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #FFDEE9;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            flex-direction: column;
+        }
+        .intro, .question-container, .response-screen {
+            display: none;
+        }
+        .visible {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .cat {
+            width: 250px;
+            height: 250px;
+            background-size: cover;
+            animation: bounce 1s infinite alternate;
+        }
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+        .message, .question-text{
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .response-message {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+    word-wrap: break-word; /* Ensures long words break and wrap onto the next line */
+    white-space: normal; /* Ensures multiple lines if needed */
+    max-width: 80%; /* Optional: Control width to ensure message looks good */
+    text-align: center; /* Optional: Align message to the center */
+    overflow-wrap: break-word; /* Breaks long words that can't fit */
+    word-break: break-word; /* Breaks long words if needed */
+}
+
+        .options button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #FFD1DC;
+            border: none;
+            border-radius: 10px;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .options button:hover {
+            background-color: #FFB6C1;
+            transform: scale(1.1);
+        }
+        .next-message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Music -->
+    <audio id="bg-music" loop>
+        <source src="song.mp3" type="audio/mp3">
+        <source src="music.ogg" type="audio/ogg">
+    </audio>
+
+    <!-- Welcome Screen -->
+    <div class="intro visible">
+        <div class="cat" style="background-image: url('cat.png');"></div>
+        <div class="message" id="start-message">Hi there! Press Enter or Tap to continue! 🫶</div>
+    </div>
+
+    <!-- Question Container -->
+    <div class="question-container">
+        <div class="question-text" id="question"></div>
+        <div class="options">
+            <button onclick="handleResponse('yes')">Yes</button>
+            <button onclick="handleResponse('no')">No</button>
+        </div>
+    </div>
+
+    <!-- Response Screen (After Clicking Yes or No) -->
+    <div class="response-screen">
+        <div class="cat" id="response-cat"></div>
+        <div class="response-message" id="response-message"></div>
+        <div class="next-message">Press Enter or Tap to continue...</div>
+    </div>
+
+    <script>
+        const questions = [
+            { question: "Do you enjoy the night in Ligao?", 
+              positive: { message: "Ohh me too! That night in Ligao will always be one of my most treasured memories in college that I can't never forget dahil naka-come out ako and also naging close kita! Sobrang special ng gabing yun for me, and knowing that you enjoyed it too makes it even more unforgettable. Ang saya lang na we shared that moment together!", image: "cat1.gif" }, 
+              negative: { message: " Ohh okay, that is sad because that night is super special to me, yun yung night na I started to like you! Pero that is okay, baka hindi ka lang talaga farm person? Or maybe hindi lang tayo same ng perspective sa night na yun? Either way, special pa rin siya for me, and I'll always treasure it!", image: "cat2.gif" } 
+            },
+            { question: "Do you think I'm a good friend?", 
+              positive: { message: "Aww, thank you! That means a lot to me. Kahit sinusungitan kita minsan, I just want to say that I really appreciate you as a friend. I'm happy na ramdam mo 'yun.❤️", image: "cat1.gif" }, 
+              negative: { message: "Ohh, okay, I understand. I’ll try to be a better friend moving forward. Thanks for being honest!😿", image: "cat2.gif" } 
+            },
+            { question: "Do you feel awkward when they tease me about you?", 
+              positive: { message: "Ohh, sorry about that! Hindi na mauulit, ayoko rin naman na maging awkward para sa'yo.", image: "cat2.gif" }, 
+              negative: { message: "Ah, okay! Buti naman, akala ko kasi baka naiinis ka na. At least we're both chill about it.", image: "cat1.gif" } 
+            },
+            { question: "Do you notice that sometimes I've been distant with you?", 
+              positive: { message: "Ahh, kasi I'm scared na baka magustuhan kita ng sobra and then masaktan lang ako. Kaya minsan, nagiging distant ako, para hindi ko na maramdaman ‘yung mga ganun feelings. ", image: "cat2.gif" }, 
+              negative: { message: "Ay, wala ka ata pake! True nga, sabi nila HAHAHA. Parang ako lang yata nag-iisip ng ganun, pero okay lang, no worries!", image: "cat2.gif" } 
+            },
+            { question: "Are you aware that I like you for real?", 
+              positive: { message: "Expected naman na, ingay kaya nila, di kanaman ata bato para di matamaan dun, diba? Charot! Seriously, I really like you. Pero, I want to say this—you're such a golden retriever kind of guy, and kung sino man magiging someone mo, ang swerte niya. I know you deserve all the good things in the world. Singkit, continue your jolliness and corniness. You’re fun to be with, and I’m happy na naging friend kita. Congrats, we survived the 1st sem! Let’s survive this 2nd sem, too. Take care and good luck with everything.  ", image: "cat1.gif" }, 
+              negative: { message: "ANO?!?!? Grabe na pagpapansin ko ah! Haha, but you know what? I’m glad we’ve been friends. You’re truly a golden retriever kind of guy, and whoever ends up with you will be lucky. I know you deserve all the good things in life. Singkit, continue being your jolly and corny self. You’re such fun to be around, and I’m happy na naging friend kita. Congrats, we survived the 1st sem! Let’s keep going and survive this 2nd sem too. Good luck with everything!", image: "cat1.gif" } 
+            }
+        ];
+    
+        let currentQuestionIndex = 0;
+        let inResponseScreen = false;
+        let musicStarted = false;
+    
+        function startGame() {
+            document.querySelector(".intro").classList.remove("visible");
+            document.querySelector(".question-container").classList.add("visible");
+            loadQuestion();
+        }
+    
+        function loadQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                let q = questions[currentQuestionIndex];
+                document.getElementById("question").innerText = q.question;
+    
+                document.querySelector(".question-container").classList.add("visible");
+                document.querySelector(".response-screen").classList.remove("visible");
+    
+                inResponseScreen = false;
+            } else {
+    document.body.innerHTML = `
+        <div style="text-align: center;">
+            <img src="cat3.gif" alt="Cute Cat" width="200">
+            <h2>Happy Valentine's! 🎉💕</h2>
+            <p>Wishing you all the best in life! I really love your presence and I’m thankful to have had you as a friend. Take care and keep being you! 💖</p>
+        </div>
+    `;
+}
+        }
+    
+        function handleResponse(choice) {
+            let q = questions[currentQuestionIndex];
+            let responseData = choice === "yes" ? q.positive : q.negative;
+    
+            document.getElementById("response-message").innerText = responseData.message;
+            document.getElementById("response-cat").style.backgroundImage = `url('${responseData.image}')`;
+    
+            document.querySelector(".question-container").classList.remove("visible");
+            document.querySelector(".response-screen").classList.add("visible");
+    
+            inResponseScreen = true;
+        }
+    
+        // Function to start music after user interaction
+        function startMusic() {
+            let music = document.getElementById("bg-music");
+            if (!musicStarted) {
+                music.muted = false; // Unmute the audio
+                music.play().catch(() => console.log("User interaction required."));
+                musicStarted = true;
+            }
+        }
+    
+        // Detect if the user is on mobile
+        function isMobile() {
+            return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        }
+    
+        // Function to handle tap or keypress to start
+        function handleStartEvent() {
+            startMusic(); // Ensures music starts
+    
+            if (document.querySelector(".intro").classList.contains("visible")) {
+                startGame();
+            } else if (inResponseScreen) {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
+        }
+    
+        // If mobile, change message and allow tap
+        if (isMobile()) {
+            document.getElementById("start-message").innerText = "Tap to start! 🫶";
+            document.addEventListener("touchstart", handleStartEvent, { once: true });
+        } else {
+            // Desktop: Enter key
+            document.addEventListener("keydown", function(event) {
+                if (event.key === "Enter") {
+                    handleStartEvent();
+                }
+            });
+        }
+    
+        // Click anywhere to start (only once)
+        document.addEventListener("click", handleStartEvent, { once: true });
+    
+        // ✅ FIX: Tap works on the feedback screen
+        document.querySelector(".response-screen").addEventListener("click", () => {
+            if (inResponseScreen) {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
+        });
+    
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Enter" && inResponseScreen) {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
+        });
+    </script>
+    
+</body>
+</html>
